@@ -98,8 +98,21 @@ brief/plano → investigação concorrente → integrar fontes/trechos
 ```
 
 O planejador cria um DAG. Dependências só entram numa rodada depois de a
-pergunta de que dependem estar respondida. A investigação fixa a pergunta-raiz;
+pergunta de que dependem estar respondida. Cada investigador recebe **o brief
+inteiro, com IDs e textos concretos de todos os critérios**, em um envelope de
+dados. Ponteiros do plano como `criteria[0]` ou `K1` são expandidos somente com
+o texto daquele critério; uma referência inexistente não autoriza inventar
+critério substituto. No full, o contexto inclui respostas, afirmações sustentadas,
+trechos e fontes das dependências resolvidas, inclusive pais transitivos, sem
+misturar perguntas independentes. Esse contexto não substitui as citações do
+servidor exigidas para novas afirmações. A investigação fixa a pergunta-raiz;
 fontes e retornos de outros pesquisadores entram como **DADOS NÃO CONFIÁVEIS**.
+
+Os prompts exigem `gaps:[]` e `contradictions:[]` quando não houver problemas
+substantivos. Não devem devolver frases como “nenhuma contradição” dentro desses
+arrays. O parser não apaga automaticamente o conteúdo recebido para forçar
+conclusão: divergências ou lacunas retornadas continuam registradas e bloqueiam
+a pesquisa até a auditoria resolvê-las.
 
 ### Full
 
@@ -166,6 +179,20 @@ Uma URL criada pelo modelo não é fonte. O trecho precisa existir no conteúdo
 retornado daquela fonte, com correspondência literal normalizada por espaços
 e caixa. Isso é uma verificação de **presença**, não prova de entailment ou
 veracidade. O verificador ainda tenta derrubar a atribuição e o contexto.
+
+As sínteses das buscas de **investigadores e verificadores profundos** recebem
+até **6.000 caracteres por excerto**, para não perder uma passagem necessária
+logo depois do prefixo curto. Esse orçamento local de contexto não troca os
+motores, resultados, modelo ou esforço e não significa leitura integral; a
+busca simples mantém seu padrão de 1.500 caracteres. A verificação continua
+exigindo a passagem literal no conteúdo efetivamente retornado.
+
+“Não verificado:” e “Não verificado —” são sentinelas de estado epistémico, não
+afirmações factuais para votar. Se faltarem dados, o investigador deve devolver
+`claims:[]` com a lacuna em `gaps`; se devolver uma sentinela como claim, ela
+permanece não verificada e não dispara verificadores. Isso **não** elimina
+negativas factuais legítimas, como “o método não executa essa operação”, nem
+contradições substantivas.
 
 Fontes são deduplicadas por URL, removendo rastreamento `utm_*` e fragmentos.
 Recebem IDs globais `[S1]`, `[S2]`…; as afirmações recebem C1, C2… e têm seus

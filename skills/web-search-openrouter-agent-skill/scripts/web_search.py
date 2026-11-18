@@ -560,7 +560,7 @@ def with_search_sources(answer, citations, *, max_sources=8):
 
 def run_search(query, *, engine="cross", model=DEFAULT_MODEL, effort=DEFAULT_EFFORT,
                client=None, max_tokens=DEFAULT_MAX_TOKENS, provider=None, dry_run=False,
-               env_file=None, timeout=600, retries=3, max_wait=60, **options):
+               env_file=None, timeout=600, retries=3, max_wait=60, excerpt_chars=1500, **options):
     if options:
         raise UsageError("Erro: opções de busca desconhecidas — Solução: confira os parâmetros documentados")
     if engine not in ENGINES:
@@ -568,6 +568,8 @@ def run_search(query, *, engine="cross", model=DEFAULT_MODEL, effort=DEFAULT_EFF
     if not isinstance(query, str) or not query.strip() or len(query) > 32000:
         raise UsageError("Erro: consulta vazia ou demasiado longa — Solução: forneça 1..32000 caracteres")
     _validate_options(model, effort, max_tokens, provider)
+    if isinstance(excerpt_chars, bool) or not isinstance(excerpt_chars, int) or not 1 <= excerpt_chars <= 30000:
+        raise UsageError("Erro: orçamento interno de excertos inválido — Solução: use excerpt_chars inteiro entre 1 e 30000")
     engines = ("exa", "firecrawl") if engine == "cross" else (engine,)
     messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": query.strip()}]
     if dry_run:
@@ -618,7 +620,7 @@ def run_search(query, *, engine="cross", model=DEFAULT_MODEL, effort=DEFAULT_EFF
         parts = ["# Pergunta original\n" + query.strip()]
         for e, result in completed:
             parts.append(untrusted_block(result["answer"], label="pesquisa-" + e, secrets=secrets))
-        parts.append(untrusted_block(source_excerpts(citations), label="excertos-fontes", secrets=secrets))
+        parts.append(untrusted_block(source_excerpts(citations, max_chars=excerpt_chars), label="excertos-fontes", secrets=secrets))
         parts.append("Responda agora à pergunta original somente com evidência dos excertos; sem suporte, 'não verificado'.")
         try:
             synthesis = client.chat([{"role": "system", "content": SYNTHESIS_SYSTEM}, {"role": "user", "content": "\n\n".join(parts)}],
