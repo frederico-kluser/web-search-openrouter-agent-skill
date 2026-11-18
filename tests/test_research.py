@@ -665,6 +665,71 @@ class ResearchTests(unittest.TestCase):
                     self.assertEqual(options["effort"], "max")
                 self.assertTrue(all(options["engine"] == "cross" for _, options in search.requests))
 
+    def test_deep_searches_receive_six_thousand_excerpt_chars(self):
+        for mode in ("flash", "full"):
+            with self.subTest(mode=mode):
+                search = FakeSearch()
+                dossier = self.run_fake(mode=mode, search=search)
+                self.assertEqual(dossier["state"], "concluido")
+                self.assertTrue(all(options["excerpt_chars"] == 6000 for _, options in search.requests))
+                self.assertTrue(any("VERIFICADOR ADVERSARIAL" in query for query, _ in search.requests))
+                self.assertTrue(any("SUBPERGUNTA" in query for query, _ in search.requests))
+
+    def test_late_literal_survives_deep_synthesis_excerpt_budget(self):
+        import web_search
+        source_text = "Contexto anterior da documentação. " * 70 + QUOTE
+        self.assertGreater(source_text.index(QUOTE), 1500)
+        self.assertNotIn(QUOTE, web_search.source_excerpts([citation(content=source_text)]))
+        fake = FakeSearch(source_text=source_text)
+        contexts = []
+        def search(query, **options):
+            result = fake(query, **options)
+            context = web_search.source_excerpts(result["citations"], max_chars=options.get("excerpt_chars", 1500))
+            contexts.append(context)
+            if QUOTE not in context and "SUBPERGUNTA" in query:
+                value = research_answer()
+                value["claims"][0]["text"] = "Não verificado: o excerto fornecido termina antes do trecho necessário."
+                result.update(raw_answer=json.dumps(value), answer=json.dumps(value))
+            return result
+        dossier = self.run_fake(search=search)
+        self.assertEqual(dossier["state"], "concluido")
+        self.assertEqual(dossier["claims"][0]["state"], "sustentada")
+        self.assertTrue(all(QUOTE in context for context in contexts))
+
+    def test_unverified_status_sentinel_not_sent_to_verifiers(self):
+        for prefix in ("Não verificado:", "não verificado —", "Nao verificado -"):
+            with self.subTest(prefix=prefix):
+                fake = FakeSearch()
+                def search(query, **options):
+                    result = fake(query, **options)
+                    if "SUBPERGUNTA" in query:
+                        value = research_answer()
+                        value["claims"][0]["text"] = prefix + " falta evidência para responder à pergunta."
+                        result.update(raw_answer=json.dumps(value), answer=json.dumps(value))
+                    return result
+                dossier = self.run_fake(search=search)
+                self.assertEqual(dossier["claims"][0]["state"], "nao-verificada")
+                self.assertEqual(dossier["state"], "em-curso")
+                self.assertFalse(any("VERIFICADOR ADVERSARIAL" in query for query, _ in fake.requests))
+                self.assertTrue(any("falta evidência" in gap for gap in dossier["questions"][0]["gaps"]))
+
+    def test_legitimate_negative_fact_is_not_an_unverified_sentinel(self):
+        negative = "O método não executa alterações no sistema de arquivos."
+        value = research_answer(quote=negative)
+        value["claims"][0]["text"] = negative
+        q = research._normalize_question({"id": "Q1", "question": ROOT})
+        parsed = research._investigation(q, ROOT, response(value, citations=[citation(content=negative)]), "flash")
+        self.assertEqual(parsed["claims"][0]["state"], "pendente")
+        self.assertEqual(parsed["question"]["gaps"], [])
+
+    def test_missing_evidence_prompt_uses_empty_claims(self):
+        search = FakeSearch()
+        self.run_fake(search=search)
+        query = next(query for query, _ in search.requests if "SUBPERGUNTA" in query)
+        self.assertIn("claims:[]", query)
+        self.assertIn("gaps:[descrição concreta da lacuna]", query)
+        self.assertIn("Negativas factuais legítimas", query)
+
     def test_raw_answer_supports_core_sources_footer(self):
         fake = FakeSearch()
         def search(query, **kwargs):

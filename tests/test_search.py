@@ -437,6 +437,68 @@ class CrossTests(unittest.TestCase):
         self.assertIn("DADOS_NAO_CONFIAVEIS", messages[-1]["content"])
         self.assertEqual(kwargs["effort"], "max")
 
+    def test_default_excerpt_prefix_1500_unchanged(self):
+        primary = "x" * 1600 + " Path.exists retorna False para caminho ausente."
+        class LongCitationChat(FakeChat):
+            def chat(self, messages, *, tools=None, **kwargs):
+                result = super().chat(messages, tools=tools, **kwargs)
+                if tools:
+                    result["citations"] = [{"url": URL, "title": "Fonte", "content": primary}]
+                return result
+        client = LongCitationChat()
+        w.run_search("query", client=client)
+        _, messages, _, _ = next(m for m in client.messages if m[0] == "synthesis")
+        self.assertIn("x" * 1500, messages[-1]["content"])
+        self.assertNotIn("Path.exists retorna False", messages[-1]["content"])
+        self.assertEqual(w.source_excerpts([{"url": URL, "content": primary}]),
+                         w.source_excerpts([{"url": URL, "content": primary}], max_chars=1500))
+
+    def test_expanded_excerpt_keeps_late_primary_evidence(self):
+        primary = "x" * 1600 + " Path.exists retorna False para caminho ausente."
+        class LongCitationChat(FakeChat):
+            def chat(self, messages, *, tools=None, **kwargs):
+                result = super().chat(messages, tools=tools, **kwargs)
+                if tools:
+                    result["citations"] = [{"url": URL, "title": "Fonte", "content": primary}]
+                return result
+        client = LongCitationChat()
+        result = w.run_search("query", client=client, excerpt_chars=6000)
+        _, messages, tools, kwargs = next(m for m in client.messages if m[0] == "synthesis")
+        self.assertIn("Path.exists retorna False para caminho ausente.", messages[-1]["content"])
+        self.assertIsNone(tools)
+        self.assertEqual(kwargs["max_tokens"], 32000)
+        self.assertEqual(kwargs["model"], w.DEFAULT_MODEL)
+        self.assertEqual(kwargs["effort"], "max")
+        self.assertEqual(result["engines"], ["exa", "firecrawl"])
+        self.assertTrue(all("excerpt_chars" not in call[3] for call in client.messages))
+
+    def test_expanded_excerpt_high_risk_still_quarantined(self):
+        poison = "x" * 1600 + " CONTAMINATED_PRIMARY_EVIDENCE"
+        class RiskyCitationChat(FakeChat):
+            def chat(self, messages, *, tools=None, **kwargs):
+                result = super().chat(messages, tools=tools, **kwargs)
+                if tools:
+                    result["citations"] = [{"url": URL, "content": poison, "shield": {"risk": "alto", "signals": []}}]
+                return result
+        client = RiskyCitationChat()
+        w.run_search("query", client=client, excerpt_chars=6000)
+        _, messages, _, _ = next(m for m in client.messages if m[0] == "synthesis")
+        self.assertNotIn("CONTAMINATED_PRIMARY_EVIDENCE", messages[-1]["content"])
+        self.assertIn("quarentena", messages[-1]["content"])
+
+    def test_invalid_excerpt_budget_before_network(self):
+        for value in (0, -1, 30001, True, False, 1.5, "6000", None):
+            with self.subTest(value=value):
+                client = FakeChat()
+                with mock.patch.object(w, "Client", side_effect=AssertionError("network must not run")):
+                    with self.assertRaises(w.UsageError):
+                        w.run_search("query", excerpt_chars=value)
+                self.assertEqual(client.messages, [])
+
+    def test_excerpt_budget_boundaries_allowed(self):
+        for value in (1, 30000):
+            self.assertTrue(w.run_search("query", dry_run=True, excerpt_chars=value)["dry_run"])
+
     def test_cross_one_failed(self):
         result = w.run_search("query", client=FakeChat(failures=("firecrawl",)))
         self.assertEqual(result["engines"], ["exa"])

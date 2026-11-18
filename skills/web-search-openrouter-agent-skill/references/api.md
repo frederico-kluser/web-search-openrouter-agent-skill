@@ -37,7 +37,7 @@ Origem autenticada fixa: `https://openrouter.ai/api/v1`. Endpoint: `POST /chat/c
 }
 ```
 
-A chamada Firecrawl troca `parameters` por `{"engine":"firecrawl","max_results":10}`. A síntese **omite tools** e recebe as respostas e até 30 excertos de 1.500 caracteres como dados delimitados. `max_results` é configuração, não garantia da quantidade de citações ou buscas feitas pelo modelo.
+A chamada Firecrawl troca `parameters` por `{"engine":"firecrawl","max_results":10}`. A síntese **omite tools** e recebe as respostas e até 30 excertos como dados delimitados. Busca simples preserva o orçamento original de 1.500 caracteres por fonte; os investigadores e verificadores de pesquisa profunda usam 6.000 para evitar perder uma citação literal que apareça depois do prefixo. O parâmetro interno `excerpt_chars` limita só o contexto da síntese, não altera os motores ou seus pedidos; não é uma flag nova da CLI. `max_results` é configuração, não garantia da quantidade de citações ou buscas feitas pelo modelo.
 
 Outros motores explícitos: `auto`, `native`, `parallel`, `perplexity`. `native` depende de suporte do provider/modelo. O perfil benchmarkado é `cross`, não estes overrides. Consulte [Server Tools: Web Search](https://openrouter.ai/docs/guides/features/server-tools/web-search) para o contrato vigente. Não migre para o plugin legado por causa de exemplos antigos.
 

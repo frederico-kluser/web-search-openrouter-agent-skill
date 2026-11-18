@@ -180,6 +180,20 @@ retornado daquela fonte, com correspondência literal normalizada por espaços
 e caixa. Isso é uma verificação de **presença**, não prova de entailment ou
 veracidade. O verificador ainda tenta derrubar a atribuição e o contexto.
 
+As sínteses das buscas de **investigadores e verificadores profundos** recebem
+até **6.000 caracteres por excerto**, para não perder uma passagem necessária
+logo depois do prefixo curto. Esse orçamento local de contexto não troca os
+motores, resultados, modelo ou esforço e não significa leitura integral; a
+busca simples mantém seu padrão de 1.500 caracteres. A verificação continua
+exigindo a passagem literal no conteúdo efetivamente retornado.
+
+“Não verificado:” e “Não verificado —” são sentinelas de estado epistémico, não
+afirmações factuais para votar. Se faltarem dados, o investigador deve devolver
+`claims:[]` com a lacuna em `gaps`; se devolver uma sentinela como claim, ela
+permanece não verificada e não dispara verificadores. Isso **não** elimina
+negativas factuais legítimas, como “o método não executa essa operação”, nem
+contradições substantivas.
+
 Fontes são deduplicadas por URL, removendo rastreamento `utm_*` e fragmentos.
 Recebem IDs globais `[S1]`, `[S2]`…; as afirmações recebem C1, C2… e têm seus
 próprios votos. A síntese publica somente textos de afirmações sustentadas;
