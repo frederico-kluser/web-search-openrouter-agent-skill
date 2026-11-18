@@ -29,6 +29,20 @@ Linux/macOS: os mesmos comandos com `python3` e `cd`. O instalador cria **symlin
 
 Raiz personalizada: `python scripts/install.py --root /caminho/skills`. Prévia sem modificar: `--dry-run`.
 
+Alternativa sem Git, em uma máquina nova: baixe o arquivo-fonte ZIP na [release](https://github.com/frederico-kluser/web-search-openrouter-agent-skill/releases), extraia-o e execute o mesmo instalador a partir da pasta extraída. A distribuição inclui SHA256, assinatura destacada, certificado e bundle Sigstore; o ZIP contém somente a tag publicada, sem chaves ou pesquisas privadas. GoReleaser e Cosign são ferramentas da CI, **não dependências da skill**.
+
+Para verificar a assinatura da v0.1.1 com Cosign 2.6.5 ou compatível, baixe o ZIP e seu bundle e execute:
+
+```bash
+cosign verify-blob --new-bundle-format \
+  --bundle web-search-openrouter-agent-skill_0.1.1_source.zip.sigstore.json \
+  --certificate-identity 'https://github.com/frederico-kluser/web-search-openrouter-agent-skill/.github/workflows/release-artifacts.yml@refs/heads/main' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  web-search-openrouter-agent-skill_0.1.1_source.zip
+```
+
+A identidade acima corresponde à publicação manual da v0.1.1; releases futuras disparadas pela própria tag usam a referência dessa tag no certificado.
+
 A estrutura `skills/web-search-openrouter-agent-skill/` é autocontida, como skills distribuídas por plugins; também pode ser copiada para uma máquina sem o instalador. Após instalar, um agente pode invocar `/web-search-openrouter-agent-skill` (recarregue o catálogo se o harness exigir).
 
 Opcionalmente, no Claude Code, use o marketplace incluído em vez dos symlinks:
