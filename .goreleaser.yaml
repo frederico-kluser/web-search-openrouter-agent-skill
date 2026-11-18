@@ -1,0 +1,26 @@
+# Distribuição fonte: nenhum compilador Go nem dependência de execução da skill.
+# Schema oficial validado contra GoReleaser v2.20.2.
+version: 2
+project_name: web-search-openrouter-agent-skill
+
+builds:
+  - id: source-only
+    skip: true
+
+source:
+  enabled: true
+  format: zip
+  name_template: "{{ .ProjectName }}_{{ .Version }}_source"
+  prefix_template: "{{ .ProjectName }}-{{ .Version }}/"
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+  algorithm: sha256
+
+changelog:
+  disable: true
+
+release:
+  mode: keep-existing
+  replace_existing_artifacts: false
+  make_latest: false
