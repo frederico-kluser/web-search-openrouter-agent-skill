@@ -30,12 +30,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Chores
 - **release:** preparar v0.1.0 ([7357dba](https://github.com/frederico-kluser/web-search-openrouter-agent-skill/commit/7357dba))
 
-## [0.1.0] - 2026-11-18
-
-### Features
-- **research:** adicionar protocolos full e flash com evidências ([5f5e8c0](https://github.com/frederico-kluser/web-search-openrouter-agent-skill/commit/5f5e8c0))
-- **search:** extrair busca cruzada benchmarkada do Capi ([1545566](https://github.com/frederico-kluser/web-search-openrouter-agent-skill/commit/1545566))
-
-### Documentation
-- **skill:** preparar distribuição global e governança open-source ([b2f8525](https://github.com/frederico-kluser/web-search-openrouter-agent-skill/commit/b2f8525))
-
