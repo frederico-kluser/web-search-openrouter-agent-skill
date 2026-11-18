@@ -13,12 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 <!--
-  [Unreleased]: https://github.com/frederico-kluser/web-search-openrouter-agent-skill/compare/v0.1.0...HEAD
+  [Unreleased]: https://github.com/frederico-kluser/web-search-openrouter-agent-skill/compare/v0.1.1...HEAD
 -->
 ## [0.1.1] - 2026-11-18
 
 ### Bug Fixes
+- **research:** transmitir brief e evidências das dependências ([a37524b](https://github.com/frederico-kluser/web-search-openrouter-agent-skill/commit/a37524b))
 - **ci:** publicar Scorecard com commit real e exigir CodeQL ([3deef87](https://github.com/frederico-kluser/web-search-openrouter-agent-skill/commit/3deef87))
+
+### Chores
+- **release:** preparar v0.1.1 com validação de segurança ([7ce2248](https://github.com/frederico-kluser/web-search-openrouter-agent-skill/commit/7ce2248))
 
 ## [0.1.0] - 2026-11-18
 
