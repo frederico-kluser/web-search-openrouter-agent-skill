@@ -10,11 +10,11 @@
 
 Extraída da busca do Capi, iniciada no commit `7e5f7230e3617ed57b21708fdac24ab714d7b222` e evoluída em `320fbb43` e `a2b65260`:
 
-1. **Sol Pro** (`openai/gpt-6.1-sol-pro`), raciocínio `max`.
+1. **Sol** (`openai/gpt-6.1-sol`), raciocínio `max`.
 2. **Exa** `deep-reasoning`, 25 resultados, contexto `high`, e **Firecrawl**, 10 resultados, em paralelo.
 3. **Síntese pelo mesmo modelo, sem ferramenta de busca**, comparando respostas e excertos reais das citações do servidor.
 
-É o perfil benchmarkado no projeto, não uma promessa universal de superioridade. Não há troca silenciosa por modelo barato nem benchmark novo. O modo `flash` reduz o protocolo e a quantidade de perguntas, **não** o modelo, o raciocínio nem a configuração de motores. Os parâmetros são configuráveis explicitamente.
+Os motores e o cruzamento vêm do benchmark do projeto; o modelo padrão é **Sol/max (não Pro)** por escolha explícita do usuário. As medidas históricas com Pro não são atribuídas a Sol. Não há promessa universal de superioridade, troca silenciosa por modelo barato ou benchmark comparativo novo. O modo `flash` reduz o protocolo e a quantidade de perguntas, **não** o modelo, o raciocínio nem a configuração de motores. Os parâmetros são configuráveis explicitamente.
 
 ## Instalar globalmente
 
@@ -72,7 +72,7 @@ Citações reais vêm de `annotations.url_citation`, não de URLs que o modelo e
 python $S search --deep-research "Qual é o estado da evidência sobre X?" --out pesquisas/x.md
 python $S research init --deep-research full "Qual é o estado da evidência sobre X?" --out pesquisas/x.md
 
-# Flash: ciclo compacto AUTOMÁTICO, com o mesmo Sol Pro/max/cross.
+# Flash: ciclo compacto AUTOMÁTICO, com o mesmo Sol/max/cross.
 python $S search --deep-research flash "Como escolher entre SQLite FTS5 e BM25?" --out pesquisas/fts.md
 
 # Full automático, com limite de rodadas explícito.

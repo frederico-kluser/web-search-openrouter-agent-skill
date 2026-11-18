@@ -6,7 +6,7 @@ Este repositório é Python 3.10+ **stdlib**, sem dependências de execução. A
 
 1. Carregue `opensource-project` e `github-agent-skill` para governança/publicação quando estiverem instaladas. Na instalação da primeira, execute `scripts/oss-enforce.sh --target <checkout>`: reentry idempotente, preservando arquivos existentes.
 2. Confirme `git status -sb` e não toque no trabalho alheio. Use branch efêmera `<tipo>/<slug>` (`feat fix docs style refactor perf test build ci revert hotfix release`).
-3. Preserve o perfil escolhido: Sol Pro (`openai/gpt-6.1-sol-pro`), raciocínio máximo, Exa `deep-reasoning` 25/high + Firecrawl 10 e síntese sem tools. Não trocar modelo/motor com base no termo flash.
+3. Preserve o perfil escolhido: Sol (`openai/gpt-6.1-sol`), raciocínio máximo, Exa `deep-reasoning` 25/high + Firecrawl 10 e síntese sem tools. Não trocar modelo/motor com base no termo flash.
 
 <!-- oss:merge-policy:begin -->
 ## Política de integração: merge, nunca rebase

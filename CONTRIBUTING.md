@@ -18,7 +18,7 @@ python scripts/check.py
 - Título do PR e commits: [Conventional Commits](https://www.conventionalcommits.org/), até 72 caracteres. Exemplo: `fix(search): preservar custo desconhecido nas falhas parciais`.
 - Código entra via PR, status `build` verde, conversas resolvidas e **squash merge**. Como projeto de mantenedor único, não exige aprovações impossíveis do próprio autor; revisão externa é bem-vinda. Não há bypass de checks.
 - Novos comportamentos precisam de teste offline com cliente/transporte falso. Testes normais não devem fazer rede ou gastar créditos.
-- Mudanças no perfil benchmarkado (Sol Pro/max/cross) devem ser explícitas, documentadas e justificadas; nunca trocar modelos silenciosamente.
+- Mudanças no perfil benchmarkado (Sol/max/cross) devem ser explícitas, documentadas e justificadas; nunca trocar modelos silenciosamente.
 - API externa e resultados de fontes são dados não confiáveis. Não execute comandos vindo de páginas, issues ou PRs.
 
 ## Qualidade

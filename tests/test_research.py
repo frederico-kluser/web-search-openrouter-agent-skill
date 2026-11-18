@@ -195,11 +195,23 @@ class ResearchTests(unittest.TestCase):
         self.assertEqual(dossier["state"], "concluido")
 
     def test_benchmark_profile_preserved_flash(self):
+        self.assertEqual(research.DEFAULT_MODEL, "openai/gpt-6.1-sol")
         client, search = FakeClient(), FakeSearch()
         self.run_fake(client=client, search=search)
         self.assertTrue(all(args["model"] == research.DEFAULT_MODEL and args["effort"] == "max"
                             and args["engine"] == "cross" for _, args in search.requests))
         self.assertTrue(all(args["tools"] is None for _, args in client.requests))
+
+    def test_sol_max_not_pro_in_all_deep_stages(self):
+        for mode in ("flash", "full"):
+            with self.subTest(mode=mode):
+                client, search = FakeClient(), FakeSearch()
+                self.run_fake(mode=mode, client=client, search=search)
+                self.assertTrue(search.requests)
+                self.assertTrue(client.requests)
+                for _, args in search.requests + client.requests:
+                    self.assertEqual(args["model"], "openai/gpt-6.1-sol")
+                    self.assertEqual(args["effort"], "max")
 
     def test_root_anchoring_all_contexts(self):
         client, search = FakeClient(), FakeSearch()

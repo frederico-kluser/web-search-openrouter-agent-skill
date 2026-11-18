@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Busca cruzada benchmarkada no Capi, disponível a qualquer agente (stdlib).
 
-Exa deep-reasoning e Firecrawl pesquisam em paralelo; Sol Pro raciocínio máximo
+Exa deep-reasoning e Firecrawl pesquisam em paralelo; Sol raciocínio máximo
 sintetiza somente as respostas/excertos, sem novas ferramentas. Sem plugins web,
 sem :online, sem Tavily e sem rotação silenciosa da chave do usuário.
 """
@@ -32,7 +32,7 @@ except ImportError:
                           untrusted_block, utf8_prefix)
 
 API_BASE = "https://openrouter.ai/api/v1"
-DEFAULT_MODEL = "openai/gpt-6.1-sol-pro"
+DEFAULT_MODEL = "openai/gpt-6.1-sol"
 DEFAULT_EFFORT = "max"
 DEFAULT_MAX_TOKENS = 32_000
 ENGINES = ("cross", "auto", "native", "exa", "parallel", "perplexity", "firecrawl")

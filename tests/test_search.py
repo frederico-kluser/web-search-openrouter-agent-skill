@@ -71,7 +71,7 @@ class FakeChat:
 
 class PayloadTests(unittest.TestCase):
     def test_benchmark_defaults(self):
-        self.assertEqual(w.DEFAULT_MODEL, "openai/gpt-6.1-sol-pro")
+        self.assertEqual(w.DEFAULT_MODEL, "openai/gpt-6.1-sol")
         self.assertEqual(w.DEFAULT_EFFORT, "max")
         self.assertEqual(w.DEFAULT_MAX_TOKENS, 32000)
 

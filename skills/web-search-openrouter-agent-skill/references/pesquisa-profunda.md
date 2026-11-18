@@ -5,9 +5,10 @@ Este protocolo é ativado **somente pela flag `--deep-research`**. Sem a flag,
 `research init`, `lint` e `run` recusam a invocação sem a flag.
 
 O nome **flash descreve o ciclo compacto**, não um modelo barato. Ambos os
-perfis mantêm **Sol Pro (`openai/gpt-6.1-sol-pro`), raciocínio `max`, Exa
+perfis mantêm **Sol (`openai/gpt-6.1-sol`), raciocínio `max`, Exa
 `deep-reasoning` 25/high + Firecrawl 10 em paralelo e síntese sem tools**.
-Este é o perfil já escolhido e benchmarkado no Capi. Os motores não são
+Os motores e o fluxo cruzado são os escolhidos no Capi; Sol/max é a escolha
+explícita do usuário para esta distribuição, não Pro. Os motores não são
 reavaliados nem substituídos silenciosamente. No protocolo profundo, um
 `--engine` diferente de `cross` é recusado antes de rede; use busca simples
 para escolher outro motor. Modelo, esforço e provider podem ser alterados

@@ -21,7 +21,7 @@ from typing import Any, Callable
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 SCHEMA_VERSION = 1
-DEFAULT_MODEL = "openai/gpt-6.1-sol-pro"
+DEFAULT_MODEL = "openai/gpt-6.1-sol"
 DEFAULT_MAX_ROUNDS = 3
 DEFAULT_MAX_TOKENS = 32_000
 MODES = ("flash", "full")

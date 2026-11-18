@@ -10,7 +10,7 @@ A extração parte de `scripts/tutorial/web-research.ts` do Capi:
 
 O cabeçalho da implementação registra em 2026-11-17 o benchmark na pergunta sobre o que o bash faz com `organiza as fotos`: Sol Pro/max + Exa demorou 151 s (~US$ 0,19), Sol Pro/max + Firecrawl 127 s (~US$ 0,14); Sonar Deep Research custou ~US$ 0,34 e afirmou uma saída de terminal sem confirmação compatível. São resultados **históricos daquela pergunta**, não preços fixos, testes repetidos aqui ou garantia de qualidade geral. A escolha do usuário é preservar o perfil cruzado benchmarkado.
 
-O default genérico de autoria do Capi é Sol; o modelo usado no benchmark de busca e nesta distribuição é explicitamente **Sol Pro** (`openai/gpt-6.1-sol-pro`). Não inferir slugs pelo nome amigável, nem trocar por outro modelo de flash.
+O modelo padrão desta distribuição é **Sol** (`openai/gpt-6.1-sol`) com raciocínio **`max`**, conforme a escolha explícita do usuário — **não Sol Pro**. Os motores e o fluxo cruzado permanecem os escolhidos no Capi. As medidas históricas acima foram feitas com Pro e não devem ser atribuídas a Sol; não há novo benchmark comparativo aqui. Flash não troca o modelo por uma alternativa barata.
 
 ## Request
 
@@ -18,7 +18,7 @@ Origem autenticada fixa: `https://openrouter.ai/api/v1`. Endpoint: `POST /chat/c
 
 ```json
 {
-  "model": "openai/gpt-6.1-sol-pro",
+  "model": "openai/gpt-6.1-sol",
   "reasoning": {"effort": "max"},
   "max_tokens": 32000,
   "messages": [

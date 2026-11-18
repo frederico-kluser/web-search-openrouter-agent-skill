@@ -1,7 +1,7 @@
 ---
 name: web-search-openrouter-agent-skill
 description: >-
-  Busca na internet pelo OpenRouter com a chave do usuário: Sol Pro no raciocínio máximo,
+  Busca na internet pelo OpenRouter com a chave do usuário: Sol no raciocínio máximo,
   Exa deep-reasoning e Firecrawl cruzados em paralelo, síntese com excertos e citações reais.
   Use para busca web, documentação atual, fatos recentes e fontes. Pesquisa profunda somente
   com --deep-research; suporta --deep-research flash (ciclo compacto automático) e full
@@ -32,7 +32,7 @@ não acessa páginas com login, não executa comandos e não substitui a leitura
 
 ## O perfil benchmarkado (não trocar silenciosamente)
 
-- Modelo: `openai/gpt-6.1-sol-pro`; raciocínio: `max`; teto de saída: 32.000 tokens por chamada.
+- Modelo: `openai/gpt-6.1-sol`; raciocínio: `max`; teto de saída: 32.000 tokens por chamada.
 - Busca cruzada padrão: Exa `deep-reasoning`, 25 resultados, contexto `high`, e Firecrawl, 10 resultados, ao mesmo tempo.
 - Síntese pelo mesmo modelo **sem ferramenta de busca**: confronta respostas e excertos recebidos.
 - O perfil vem do benchmark do Capi. `flash` **não** troca o modelo, os motores ou o esforço por opções baratas.
