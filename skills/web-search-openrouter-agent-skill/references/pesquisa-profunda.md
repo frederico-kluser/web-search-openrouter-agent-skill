@@ -98,8 +98,21 @@ brief/plano → investigação concorrente → integrar fontes/trechos
 ```
 
 O planejador cria um DAG. Dependências só entram numa rodada depois de a
-pergunta de que dependem estar respondida. A investigação fixa a pergunta-raiz;
+pergunta de que dependem estar respondida. Cada investigador recebe **o brief
+inteiro, com IDs e textos concretos de todos os critérios**, em um envelope de
+dados. Ponteiros do plano como `criteria[0]` ou `K1` são expandidos somente com
+o texto daquele critério; uma referência inexistente não autoriza inventar
+critério substituto. No full, o contexto inclui respostas, afirmações sustentadas,
+trechos e fontes das dependências resolvidas, inclusive pais transitivos, sem
+misturar perguntas independentes. Esse contexto não substitui as citações do
+servidor exigidas para novas afirmações. A investigação fixa a pergunta-raiz;
 fontes e retornos de outros pesquisadores entram como **DADOS NÃO CONFIÁVEIS**.
+
+Os prompts exigem `gaps:[]` e `contradictions:[]` quando não houver problemas
+substantivos. Não devem devolver frases como “nenhuma contradição” dentro desses
+arrays. O parser não apaga automaticamente o conteúdo recebido para forçar
+conclusão: divergências ou lacunas retornadas continuam registradas e bloqueiam
+a pesquisa até a auditoria resolvê-las.
 
 ### Full
 

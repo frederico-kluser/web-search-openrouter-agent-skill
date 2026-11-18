@@ -566,6 +566,105 @@ class ResearchTests(unittest.TestCase):
         raw = text + "\n![secret][ref]"
         self.assertTrue(any("Conteúdo ativo" in e for e in research.lint_dossier(raw)["errors"]))
 
+    def test_criterion_pointer_expanded_and_brief_provided(self):
+        criterion = "Exigir passagem identificável da documentação primária da versão solicitada."
+        plan = {"objective": ROOT, "scope": "Somente a versão solicitada", "criteria": [criterion],
+                "perspectives": ["documentação primária"],
+                "questions": [{"id": "Q1", "question": "Questão atómica", "priority": "alta", "depends_on": [],
+                               "criterion": "Aplicar o único critério de término definido em criteria[0]."}]}
+        search = FakeSearch()
+        dossier = self.run_fake(client=FakeClient(planner=plan), search=search)
+        worker_query = next(query for query, _ in search.requests if "SUBPERGUNTA Q1:" in query)
+        packet = envelope_payload(worker_query)
+        self.assertEqual(packet["brief"]["criteria"][0]["id"], "K1")
+        self.assertEqual(packet["brief"]["criteria"][0]["text"], criterion)
+        self.assertEqual(packet["brief"]["scope"], plan["scope"])
+        self.assertEqual(packet["brief"]["perspectives"], plan["perspectives"])
+        self.assertIn(criterion, packet["criterion"])
+        self.assertNotIn("criteria[0]", packet["criterion"])
+        self.assertEqual(packet["resolved_dependencies"], [])
+        self.assertIn(criterion, dossier["questions"][0]["criterion"])
+
+    def test_named_criterion_reference_resolves_real_text(self):
+        brief = {"criteria": [{"id": "K1", "text": "Critério original verificável"}]}
+        expanded = research._resolve_criterion("Aplicar K1", brief)
+        self.assertEqual(expanded, "Aplicar K1: Critério original verificável")
+        self.assertEqual(research._resolve_criterion(expanded, brief), expanded)
+
+    def test_unknown_criterion_pointer_not_invented(self):
+        brief = {"criteria": [{"id": "K1", "text": "Critério original verificável"}]}
+        self.assertEqual(research._resolve_criterion("Aplicar criteria[9] e K8", brief),
+                         "Aplicar criteria[9] e K8")
+
+    def test_full_dependencies_include_answers_and_verified_evidence(self):
+        plan = {"objective": ROOT, "scope": "Definição seguida da aplicação", "criteria": ["Confirmar aplicação"],
+                "perspectives": [], "questions": [
+                    {"id": "Q1", "question": "Definição necessária", "criterion": "K1", "depends_on": []},
+                    {"id": "Q2", "question": "Aplicação dependente", "criterion": "K1", "depends_on": ["Q1"]},
+                    {"id": "Q3", "question": "Contexto independente", "criterion": "K1", "depends_on": []}]}
+        search = FakeSearch()
+        dossier = self.run_fake(mode="full", max_rounds=2, client=FakeClient(planner=plan), search=search)
+        self.assertEqual(dossier["state"], "concluido")
+        queries = [query for query, _ in search.requests if "SUBPERGUNTA Q2:" in query]
+        self.assertEqual(len(queries), 1)
+        packet = envelope_payload(queries[0])
+        dependencies = packet["resolved_dependencies"]
+        self.assertEqual([item["id"] for item in dependencies], ["Q1"])
+        self.assertIn("A documentação permite", dependencies[0]["answer"])
+        self.assertEqual(dependencies[0]["claims"][0]["state"], "sustentada")
+        self.assertEqual(dependencies[0]["claims"][0]["quotes"][0]["quote"], QUOTE)
+        self.assertEqual(dependencies[0]["sources"][0]["url"], URL)
+        self.assertIn(QUOTE, dependencies[0]["sources"][0]["content"])
+        self.assertEqual([row["questions"] for row in dossier["rounds"]], [["Q1", "Q3"], ["Q2"]])
+
+    def test_dependency_context_includes_transitive_resolved_parents(self):
+        dossier = self.run_fake(mode="full")
+        q1 = dossier["questions"][0]
+        q2 = {**copy.deepcopy(q1), "id": "Q2", "depends_on": ["Q1"]}
+        q3 = {**copy.deepcopy(q1), "id": "Q3", "depends_on": ["Q2"]}
+        unrelated = {**copy.deepcopy(q1), "id": "Q4", "depends_on": []}
+        dossier["questions"].extend([q2, q3, unrelated])
+        context = research._dependency_context(q3, dossier)
+        self.assertEqual([item["id"] for item in context], ["Q1", "Q2"])
+        self.assertTrue(all(item["claims"] and item["sources"] for item in context))
+
+    def test_unresolved_dependency_has_no_context_and_is_not_scheduled(self):
+        plan = {"criteria": ["Confirmar aplicação"], "questions": [
+            {"id": "Q1", "question": "Definição", "depends_on": []},
+            {"id": "Q2", "question": "Aplicação", "depends_on": ["Q1"]}]}
+        search = FakeSearch(fail_worker=True)
+        dossier = self.run_fake(mode="full", max_rounds=1, client=FakeClient(planner=plan), search=search)
+        self.assertEqual(research._dependency_context(dossier["questions"][1], dossier), [])
+        self.assertFalse(any("SUBPERGUNTA Q2:" in query for query, _ in search.requests))
+
+    def test_empty_problem_arrays_instructed_without_filtering_content(self):
+        client, search = FakeClient(), FakeSearch()
+        self.run_fake(client=client, search=search)
+        worker_query = next(query for query, _ in search.requests if "SUBPERGUNTA" in query)
+        critic_query = next(messages[-1]["content"] for messages, _ in client.requests
+                            if "PAPEL ISOLADO: critico" in messages[-1]["content"])
+        for query in (worker_query, critic_query):
+            self.assertIn("gaps:[]", query)
+            self.assertIn("contradictions:[]", query)
+            self.assertIn("nenhuma contradição", query)
+        q = research._normalize_question({"id": "Q1", "question": ROOT})
+        value = research_answer()
+        value["contradictions"] = ["Nenhuma afirmação conflitante foi identificada."]
+        parsed = research._investigation(q, ROOT, response(value, citations=[citation()]), "flash")
+        self.assertEqual(parsed["question"]["contradictions"], value["contradictions"])
+        self.assertEqual(parsed["question"]["state"], "contestada")
+
+    def test_sol_max_in_every_flash_and_full_stage(self):
+        self.assertEqual(research.DEFAULT_MODEL, "openai/gpt-6.1-sol")
+        for mode in ("flash", "full"):
+            with self.subTest(mode=mode):
+                client, search = FakeClient(), FakeSearch()
+                self.run_fake(mode=mode, client=client, search=search)
+                for _, options in client.requests + search.requests:
+                    self.assertEqual(options["model"], "openai/gpt-6.1-sol")
+                    self.assertEqual(options["effort"], "max")
+                self.assertTrue(all(options["engine"] == "cross" for _, options in search.requests))
+
     def test_raw_answer_supports_core_sources_footer(self):
         fake = FakeSearch()
         def search(query, **kwargs):
