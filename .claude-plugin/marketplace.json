@@ -1,0 +1,14 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "web-search-openrouter-agent-skill",
+  "description": "Busca web e pesquisa profunda com OpenRouter BYOK, Sol, Exa e Firecrawl.",
+  "owner": {"name": "Frederico Kluser"},
+  "plugins": [
+    {
+      "name": "web-search-openrouter-agent-skill",
+      "description": "CLI stdlib com busca cruzada, evidências rastreáveis e full/flash research.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
