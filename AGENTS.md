@@ -14,7 +14,7 @@ Este repositório é Python 3.10+ **stdlib**, sem dependências de execução. A
 - Sincronizar: `git fetch origin && git merge origin/main` (ou `git pull` configurado para merge).
 - Integrar: PR com título Conventional Commit, checks verdes, `gh pr merge --squash --delete-branch`.
 - Nunca `git rebase`, `git pull --rebase`, rebase-merge, force-push ou `--no-verify`.
-- `main` é protegido por PR + check `build`, squash-only e histórico linear; os JSON versionados em `.github/rulesets/` são a política declarativa.
+- `main` é protegido por PR + checks `build` e `CodeQL (Python)`, squash-only e histórico linear; os JSON versionados em `.github/rulesets/` são a política declarativa.
 <!-- oss:merge-policy:end -->
 
 ## Gates e qualidade
