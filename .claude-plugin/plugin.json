@@ -1,0 +1,11 @@
+{
+  "name": "web-search-openrouter-agent-skill",
+  "version": "0.1.0",
+  "description": "Busca OpenRouter cruzada com Sol Pro, Exa e Firecrawl; pesquisa profunda full/flash usando a chave do usuário.",
+  "author": {
+    "name": "Frederico Kluser",
+    "url": "https://github.com/frederico-kluser"
+  },
+  "repository": "https://github.com/frederico-kluser/web-search-openrouter-agent-skill",
+  "license": "MIT"
+}
